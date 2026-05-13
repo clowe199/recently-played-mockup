@@ -44,6 +44,17 @@ Framer Motion. No build secrets, no proprietary fonts, MIT licensed.
 [**clowe.dev/music**](https://clowe.dev/music) — the production deploy this
 template was extracted from. Same page, real data.
 
+## Deploy your own
+
+One click, three providers:
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new/template?template=https%3A%2F%2Fgithub.com%2Fclowe199%2Frecently-played-mockup&referralCode=PoO3nM)
+&nbsp;
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fclowe199%2Frecently-played-mockup)
+
+Full deploy walkthroughs (including Fly, Docker, and bare-metal Node) live
+in [docs/deploy.md](docs/deploy.md).
+
 ---
 
 ## Where to go next

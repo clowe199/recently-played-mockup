@@ -25,7 +25,11 @@ TLS cert for free.
 Good fit if you also need Postgres on the same provider — it's one click in
 the Railway dashboard.
 
-1. <https://railway.app/new> → **Deploy from GitHub** → your fork.
+[**One-click deploy**](https://railway.com/new/template?template=https%3A%2F%2Fgithub.com%2Fclowe199%2Frecently-played-mockup&referralCode=PoO3nM)
+
+Or manually:
+
+1. <https://railway.com/new> → **Deploy from GitHub** → your fork.
 2. Railway auto-detects Next.js. Accept the defaults.
 3. Add env vars under **Variables**.
 4. (Optional) Add a Postgres plugin and Railway will set `DATABASE_URL`
