@@ -27,6 +27,10 @@ Three things:
    to load your listening data.
 2. **`/api/apple-music/history`** — currently a stub that returns sample data
    from `src/lib/sampleHistory.ts`. **This is the one file you'll replace.**
+   It is also the endpoint the [stylo](https://github.com/clowe199/CloweScrobbler)
+   app uses to test a connection — which is why a fork that cannot receive a
+   single scrobble still reports itself as connected. See
+   [stylo-api.md](./stylo-api.md) if that is what you are building toward.
 3. **`/api/apple-music/search`** — a live proxy to the public iTunes Search
    API. Powers artwork fallbacks and the 30-second audio previews. No auth
    needed, no env vars.

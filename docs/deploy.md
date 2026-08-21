@@ -162,6 +162,21 @@ URL the README keeps mentioning — that's the public-facing artifact.
 
 ---
 
+## If you are pointing the stylo app at this
+
+Deploying is not the last step, and the failure is a quiet one.
+
+This repo is a music *page*. It serves `/api/apple-music/history` and
+`/api/now-playing`, and that is enough for stylo's connection test to pass and
+report the server healthy — but `POST /api/scrobble` does not exist here, so
+every scrobble the app sends comes back 404 and nothing accumulates.
+
+[**docs/stylo-api.md**](./stylo-api.md) has the endpoints stylo calls, their
+payloads, and a curl check that tells the two states apart. Implement
+`POST /api/scrobble` first; it is the only one required for history to build up.
+
+---
+
 ## You're live
 
 Go play a song so the timestamps look real and share the link.

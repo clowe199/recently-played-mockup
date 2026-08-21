@@ -66,6 +66,7 @@ in [docs/deploy.md](docs/deploy.md).
 | [**Wire up your data**](docs/data-sources.md) | Recipes for plugging in real listening history: Last.fm, Spotify export, a Postgres DB, your own scrobbler |
 | [**Deploy**](docs/deploy.md) | Railway, Vercel, Fly, Docker, bare-metal Node — pick your fighter |
 | [**Architecture**](docs/architecture.md) | How the page is built and why it animates the way it does |
+| [**stylo API**](docs/stylo-api.md) | The endpoints the stylo iOS app calls — and which of them this repo does *not* implement yet |
 
 If you just want to get a feel for the code, the entire UI is in one file:
 [`src/app/music/page.tsx`](src/app/music/page.tsx). 1,200 lines, no
