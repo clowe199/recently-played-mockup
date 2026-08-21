@@ -5,28 +5,34 @@ from a server you point it at.
 
 ## Read this first
 
-**This mockup does not implement most of it.** Out of the box it serves a
-music page, not a scrobble receiver. That distinction is easy to miss, because
-the one endpoint stylo uses to *test* the connection is the one that already
-exists:
+The write path ships and works. The read-back endpoints do not:
 
 | stylo calls | this repo ships |
 | --- | --- |
-| `GET /api/apple-music/history` | ✅ (sample data) |
+| `POST /api/scrobble` | ✅ **receives plays, deduped** |
+| `PATCH /api/scrobble/artwork` | ✅ |
 | `POST /api/now-playing` | ✅ |
-| `POST /api/scrobble` | ❌ |
-| `PATCH /api/scrobble/artwork` | ❌ |
+| `GET /api/apple-music/history` | ✅ (sample data — see the caveat below) |
 | `GET /api/apple-music/track-history` | ❌ |
 | `GET /api/apple-music/artist-history` | ❌ |
 | `POST /api/live-activity` | ❌ |
 | `POST /api/live-activity/end` | ❌ |
 
-So a fresh deploy will connect successfully, report itself healthy, and then
-drop every scrobble on the floor with a 404. If you have set the URL and key in
-stylo and nothing is arriving, this table is why.
+**But the default store is in memory.** A fresh fork will accept scrobbles,
+dedupe them correctly and answer exactly as stylo expects — and lose the lot on
+restart, and on serverless hosts keep a separate copy per instance. That is
+enough to watch the round trip work and confirm your secret is right. It is not
+somewhere to keep a year of listening. Point
+[`src/lib/scrobbleStore.ts`](../src/lib/scrobbleStore.ts) at a real database and
+every route below keeps working untouched.
 
-Implement `POST /api/scrobble` first. It is the only one that has to exist for
-history to accumulate; everything else makes the app's screens better.
+The two `apple-music/*-history` endpoints are what the app's Track Details
+screen reads back. Without them it falls back to the phone's local log, which
+holds the last 500 plays — so those screens work, they just cannot see further
+back than the phone can. Nothing breaks; you get less.
+
+`live-activity` is only for pushing Lock Screen updates while the app is
+suspended. Skip it unless you are set up for APNs.
 
 ## Authentication
 
@@ -164,7 +170,7 @@ Fire-and-forget. What is playing right now, for a live indicator on your page.
 }
 ```
 
-Already implemented here. Do not write these to history — a now-playing ping is
+Implemented here. Do not write these to history — a now-playing ping is
 not a play, and the same track will arrive again through `/api/scrobble` if it
 finishes.
 
@@ -191,7 +197,7 @@ export STYLO_SECRET=your-shared-secret
 curl -s -H "Authorization: Bearer $STYLO_SECRET" \
   "$STYLO_URL/api/apple-music/history?limit=0" | jq
 
-# 2. The one that actually matters. A 404 here is the failure this page is about.
+# 2. The write path. This is the one that has to work.
 curl -s -X POST -H "Authorization: Bearer $STYLO_SECRET" \
   -H "Content-Type: application/json" \
   -d '{"name":"Test","artist":"Test","durationMs":180000,"playedAt":'"$(date +%s)"'000}' \
@@ -200,8 +206,11 @@ curl -s -X POST -H "Authorization: Bearer $STYLO_SECRET" \
 # 3. Send it twice. The second should come back inserted:false, not an error.
 ```
 
-If step 1 succeeds and step 2 returns 404, you have deployed the mockup without
-adding the write endpoint. That is the expected state of a fresh fork, and
-implementing `POST /api/scrobble` is the fix.
+Step 2 should return `{"success":true,"inserted":true}`, and running it a
+second time `inserted:false` — that is the dedupe working, not a failure.
+
+A 404 there means you are on a fork from before the write endpoint existed.
+A 401 means `CRON_SECRET` is unset on the server, or does not match what you
+sent; the response body says which.
 
 Verify without a secret too — every one of these should refuse you.

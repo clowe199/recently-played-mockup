@@ -166,14 +166,16 @@ URL the README keeps mentioning — that's the public-facing artifact.
 
 Deploying is not the last step, and the failure is a quiet one.
 
-This repo is a music *page*. It serves `/api/apple-music/history` and
-`/api/now-playing`, and that is enough for stylo's connection test to pass and
-report the server healthy — but `POST /api/scrobble` does not exist here, so
-every scrobble the app sends comes back 404 and nothing accumulates.
+`POST /api/scrobble` works out of the box — authenticated, validated and
+deduplicated. What it does NOT do by default is remember anything past a
+restart: the store is in memory, so on Vercel or any serverless host each
+instance keeps its own copy and none of it survives.
 
-[**docs/stylo-api.md**](./stylo-api.md) has the endpoints stylo calls, their
-payloads, and a curl check that tells the two states apart. Implement
-`POST /api/scrobble` first; it is the only one required for history to build up.
+So the order is: deploy, set `CRON_SECRET`, confirm a scrobble round-trips with
+the curl check in [**docs/stylo-api.md**](./stylo-api.md), and only then swap
+[`src/lib/scrobbleStore.ts`](../src/lib/scrobbleStore.ts) for a real database.
+Doing it that way means when storage misbehaves you already know the transport
+and the secret are fine.
 
 ---
 
